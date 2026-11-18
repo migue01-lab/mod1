@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,56 +56,67 @@
         }
         .correct { color: #27ae60; }
         .incorrect { color: #c0392b; }
+        .reveal { color: #e67e22; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>English Practice Exercises</h1>
-        <p>Ordena las palabras, responde las preguntas y practica la gramática que vimos hoy.</p>
+        <p>Unscramble the words, answer the questions, and practice today's grammar.</p>
 
         <div id="exercises-container"></div>
     </div>
 
     <script>
         const exercises = [
-            { id: 1, type: "order", prompt: "Ordene para formar la pregunta de ocupación:", words: ["does", "What", "she", "do?"], answer: "What does she do?" },
-            { id: 2, type: "order", prompt: "Ordene para decir 'Ella es doctora':", words: ["is", "She", "a", "doctor"], answer: "She is a doctor" },
-            { id: 3, type: "order", prompt: "Ordene para hacer la pregunta en plural:", words: ["do", "What", "they", "do?"], answer: "What do they do?" },
-            { id: 4, type: "order", prompt: "Ordene para decir 'Ellos son ingenieros':", words: ["are", "They", "engineers"], answer: "They are engineers" },
-            { id: 5, type: "order", prompt: "Ordene la frase con artículo correcto (vocal):", words: ["is", "She", "artist", "an"], answer: "She is an artist" },
-            { id: 6, type: "order", prompt: "Ordene la oración con 'student':", words: ["student", "is", "She", "a"], answer: "She is a student" },
-            { id: 7, type: "order", prompt: "Ordene la oración con 'chef':", words: ["chef", "a", "is", "She"], answer: "She is a chef" },
-            { id: 8, type: "order", prompt: "Ordene la respuesta sobre profesión propia:", words: ["teacher", "am", "English", "an", "I"], answer: "I am an English teacher" },
-            { id: 9, type: "order", prompt: "Ordene la pregunta sobre la edad:",.replace(',', ''), words: ["old", "are", "How", "you?"], answer: "How old are you?" },
-            { id: 10, type: "order", prompt: "Ordene para responder tu edad (ejemplo):", words: ["years", "I", "old", "am", "32"], answer: "I am 32 years old" }
+            { id: 1, prompt: "Unscramble to form the occupation question:", words: ["does", "What", "she", "do?"], answer: "What does she do?" },
+            { id: 2, prompt: "Unscramble to say 'She is a doctor':", words: ["is", "She", "a", "doctor"], answer: "She is a doctor" },
+            { id: 3, prompt: "Unscramble to form the plural question:", words: ["do", "What", "they", "do?"], answer: "What do they do?" },
+            { id: 4, prompt: "Unscramble to say 'They are engineers':", words: ["are", "They", "engineers"], answer: "They are engineers" },
+            { id: 5, prompt: "Unscramble the sentence with the correct article (vowel sound):", words: ["is", "She", "artist", "an"], answer: "She is an artist" },
+            { id: 6, prompt: "Unscramble the sentence with 'student':", words: ["student", "is", "She", "a"], answer: "She is a student" },
+            { id: 7, prompt: "Unscramble the sentence with 'chef':", words: ["chef", "a", "is", "She"], answer: "She is a chef" },
+            { id: 8, prompt: "Unscramble the response about your own occupation:", words: ["teacher", "am", "English", "an", "I"], answer: "I am an English teacher" },
+            { id: 9, prompt: "Unscramble the question about age:", words: ["old", "are", "How", "you?"], answer: "How old are you?" },
+            { id: 10, prompt: "Unscramble to state your age (example):", words: ["years", "I", "old", "am", "32"], answer: "I am 32 years old" }
         ];
 
+        const attempts = {};
         const container = document.getElementById("exercises-container");
 
         exercises.forEach((ex, index) => {
+            attempts[ex.id] = 0;
+            const shuffledWords = [...ex.words].sort(() => Math.random() - 0.5);
+
             const div = document.createElement("div");
             div.className = "exercise";
             div.innerHTML = `
-                <p><strong>Ejercicio ${index + 1}:</strong> ${ex.prompt}</p>
-                <p><em>Palabras desordenadas:</em> [ ${ex.words.sort(() => Math.random() - 0.5).join(", ")} ]</p>
-                <input type="text" id="input-${ex.id}" placeholder="Escribe tu respuesta aquí...">
-                <button onclick="checkAnswer(${ex.id}, '${ex.answer.replace(/'/g, "\\'")}')">Comprobar</button>
+                <p><strong>Exercise ${index + 1}:</strong> ${ex.prompt}</p>
+                <p><em>Scrambled words:</em> [ ${shuffledWords.join(", ")} ]</p>
+                <input type="text" id="input-${ex.id}" placeholder="Type your answer here...">
+                <button onclick="checkAnswer(${ex.id}, '${ex.answer.replace(/'/g, "\\\\'")}')">Check</button>
                 <div id="feedback-${ex.id}" class="feedback"></div>
             `;
             container.appendChild(div);
         });
 
         function checkAnswer(id, correctAnswer) {
-            const userinput = document.getElementById(`input-${id}`).value.trim();
+            const userInput = document.getElementById(`input-${id}`).value.trim();
             const feedback = document.getElementById(`feedback-${id}`);
             
-            // Limpiamos signos de interrogación o puntos extras para una comparación flexible
-            if (userinput.toLowerCase() === correctAnswer.toLowerCase()) {
-                feedback.textContent = "¡Correcto! Great job!";
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedback.textContent = "Correct! Great job!";
                 feedback.className = "feedback correct";
+                attempts[id] = -1; 
             } else {
-                feedback.textContent = `Incorrecto. La respuesta esperada era: "${correctAnswer}"`;
-                feedback.className = "feedback incorrect";
+                attempts[id]++;
+                if (attempts[id] === 1) {
+                    feedback.textContent = "Incorrect. Check well and try again!";
+                    feedback.className = "feedback incorrect";
+                } else {
+                    feedback.textContent = `Incorrect. The correct answer was: "${correctAnswer}"`;
+                    feedback.className = "feedback reveal";
+                }
             }
         }
     </script>
