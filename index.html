@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Practice Exercises</title>
+    <title>English Practice Exercises - Drag and Drop</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
             background: #fff;
             padding: 30px;
@@ -25,18 +25,40 @@
             color: #2c3e50;
         }
         .exercise {
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
             border-left: 4px solid #3498db;
             background: #ecf0f1;
             border-radius: 4px;
         }
-        input[type="text"] {
-            padding: 8px;
-            width: 60%;
-            margin-top: 8px;
-            border: 1px solid #bdc3c7;
+        .word-bank, .drop-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 45px;
+            padding: 10px;
+            background: #fff;
+            border: 2px dashed #bdc3c7;
+            border-radius: 6px;
+            margin-top: 10px;
+            align-items: center;
+        }
+        .drop-zone {
+            border-color: #3498db;
+            background: #fdfefe;
+        }
+        .word-chip {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 14px;
             border-radius: 4px;
+            cursor: grab;
+            font-weight: bold;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .word-chip:active {
+            cursor: grabbing;
         }
         button {
             padding: 8px 15px;
@@ -45,13 +67,13 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #27ae60;
         }
         .feedback {
-            margin-top: 5px;
+            margin-top: 8px;
             font-weight: bold;
         }
         .correct { color: #27ae60; }
@@ -62,23 +84,23 @@
 <body>
     <div class="container">
         <h1>English Practice Exercises</h1>
-        <p>Unscramble the words, answer the questions, and practice today's grammar.</p>
+        <p>Drag and drop the words into the box to build the correct sentences and questions.</p>
 
         <div id="exercises-container"></div>
     </div>
 
     <script>
         const exercises = [
-            { id: 1, prompt: "Unscramble to form the occupation question:", words: ["does", "What", "she", "do?"], answer: "What does she do?" },
-            { id: 2, prompt: "Unscramble to say 'She is a doctor':", words: ["is", "She", "a", "doctor"], answer: "She is a doctor" },
-            { id: 3, prompt: "Unscramble to form the plural question:", words: ["do", "What", "they", "do?"], answer: "What do they do?" },
-            { id: 4, prompt: "Unscramble to say 'They are engineers':", words: ["are", "They", "engineers"], answer: "They are engineers" },
-            { id: 5, prompt: "Unscramble the sentence with the correct article (vowel sound):", words: ["is", "She", "artist", "an"], answer: "She is an artist" },
-            { id: 6, prompt: "Unscramble the sentence with 'student':", words: ["student", "is", "She", "a"], answer: "She is a student" },
-            { id: 7, prompt: "Unscramble the sentence with 'chef':", words: ["chef", "a", "is", "She"], answer: "She is a chef" },
-            { id: 8, prompt: "Unscramble the response about your own occupation:", words: ["teacher", "am", "English", "an", "I"], answer: "I am an English teacher" },
-            { id: 9, prompt: "Unscramble the question about age:", words: ["old", "are", "How", "you?"], answer: "How old are you?" },
-            { id: 10, prompt: "Unscramble to state your age (example):", words: ["years", "I", "old", "am", "32"], answer: "I am 32 years old" }
+            { id: 1, prompt: "Order the words to ask about someone's occupation:", words: ["What", "does", "she", "do?"], answer: "What does she do?" },
+            { id: 2, prompt: "Build the sentence for a female doctor:", words: ["She", "is", "a", "doctor"], answer: "She is a doctor" },
+            { id: 3, prompt: "Make the question for plural occupations:", words: ["What", "do", "they", "do?"], answer: "What do they do?" },
+            { id: 4, prompt: "Construct the plural sentence for engineers:", words: ["They", "are", "engineers"], answer: "They are engineers" },
+            { id: 5, prompt: "Form the sentence using the correct vowel article:", words: ["She", "is", "an", "artist"], answer: "She is an artist" },
+            { id: 6, prompt: "Create the sentence with the word 'student':", words: ["She", "is", "a", "student"], answer: "She is a student" },
+            { id: 7, prompt: "Build the sentence using 'chef':", words: ["She", "is", "a", "chef"], answer: "She is a chef" },
+            { id: 8, prompt: "Put your personal occupation response in order:", words: ["I", "am", "an", "English", "teacher"], answer: "I am an English teacher" },
+            { id: 9, prompt: "Organize the words to ask someone's age:", words: ["How", "old", "are", "you?"], answer: "How old are you?" },
+            { id: 10, prompt: "Arrange the words to state an age example:", words: ["I", "am", "32", "years", "old"], answer: "I am 32 years old" }
         ];
 
         const attempts = {};
@@ -92,26 +114,73 @@
             div.className = "exercise";
             div.innerHTML = `
                 <p><strong>Exercise ${index + 1}:</strong> ${ex.prompt}</p>
-                <p><em>Scrambled words:</em> [ ${shuffledWords.join(", ")} ]</p>
-                <input type="text" id="input-${ex.id}" placeholder="Type your answer here...">
+                <div class="drop-zone" id="drop-${ex.id}" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+                <div class="word-bank" id="bank-${ex.id}" ondragover="allowDrop(event)" ondrop="dropToBank(event)">
+                    ${shuffledWords.map(w => `<div class="word-chip" draggable="true" ondragstart="drag(event)">${w}</div>`).join('')}
+                </div>
                 <button onclick="checkAnswer(${ex.id}, '${ex.answer.replace(/'/g, "\\\\'")}')">Check</button>
                 <div id="feedback-${ex.id}" class="feedback"></div>
             `;
             container.appendChild(div);
         });
 
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text/plain", ev.target.outerHTML);
+            setTimeout(() => ev.target.remove(), 0);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text/plain");
+            let targetZone = ev.target;
+            if (!targetZone.classList.contains('drop-zone')) {
+                targetZone = targetZone.closest('.drop-zone');
+            }
+            if (targetZone) {
+                targetZone.insertAdjacentHTML('beforeend', data);
+                makeChipsDraggable();
+            }
+        }
+
+        function dropToBank(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text/plain");
+            let targetBank = ev.target;
+            if (!targetBank.classList.contains('word-bank')) {
+                targetBank = targetBank.closest('.word-bank');
+            }
+            if (targetBank) {
+                targetBank.insertAdjacentHTML('beforeend', data);
+                makeChipsDraggable();
+            }
+        }
+
+        function makeChipsDraggable() {
+            const chips = document.querySelectorAll('.word-chip');
+            chips.forEach(chip => {
+                chip.setAttribute('draggable', 'true');
+                chip.ondragstart = drag;
+            });
+        }
+
         function checkAnswer(id, correctAnswer) {
-            const userInput = document.getElementById(`input-${id}`).value.trim();
+            const dropZone = document.getElementById(`drop-${id}`);
+            const chips = dropZone.querySelectorAll('.word-chip');
+            const userSentence = Array.from(chips).map(chip => chip.textContent).join(" ");
             const feedback = document.getElementById(`feedback-${id}`);
             
-            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+            if (userSentence.toLowerCase() === correctAnswer.toLowerCase()) {
                 feedback.textContent = "Correct! Great job!";
                 feedback.className = "feedback correct";
-                attempts[id] = -1; 
+                attempts[id] = -1;
             } else {
                 attempts[id]++;
                 if (attempts[id] === 1) {
-                    feedback.textContent = "Incorrect. Check well and try again!";
+                    feedback.textContent = "Incorrect. Check your order and try again!";
                     feedback.className = "feedback incorrect";
                 } else {
                     feedback.textContent = `Incorrect. The correct answer was: "${correctAnswer}"`;
