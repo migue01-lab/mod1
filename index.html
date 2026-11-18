@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Practice Exercises</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .exercise {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            background: #ecf0f1;
+            border-radius: 4px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 60%;
+            margin-top: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        .feedback {
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .correct { color: #27ae60; }
+        .incorrect { color: #c0392b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>English Practice Exercises</h1>
+        <p>Ordena las palabras, responde las preguntas y practica la gramática que vimos hoy.</p>
+
+        <div id="exercises-container"></div>
+    </div>
+
+    <script>
+        const exercises = [
+            { id: 1, type: "order", prompt: "Ordene para formar la pregunta de ocupación:", words: ["does", "What", "she", "do?"], answer: "What does she do?" },
+            { id: 2, type: "order", prompt: "Ordene para decir 'Ella es doctora':", words: ["is", "She", "a", "doctor"], answer: "She is a doctor" },
+            { id: 3, type: "order", prompt: "Ordene para hacer la pregunta en plural:", words: ["do", "What", "they", "do?"], answer: "What do they do?" },
+            { id: 4, type: "order", prompt: "Ordene para decir 'Ellos son ingenieros':", words: ["are", "They", "engineers"], answer: "They are engineers" },
+            { id: 5, type: "order", prompt: "Ordene la frase con artículo correcto (vocal):", words: ["is", "She", "artist", "an"], answer: "She is an artist" },
+            { id: 6, type: "order", prompt: "Ordene la oración con 'student':", words: ["student", "is", "She", "a"], answer: "She is a student" },
+            { id: 7, type: "order", prompt: "Ordene la oración con 'chef':", words: ["chef", "a", "is", "She"], answer: "She is a chef" },
+            { id: 8, type: "order", prompt: "Ordene la respuesta sobre profesión propia:", words: ["teacher", "am", "English", "an", "I"], answer: "I am an English teacher" },
+            { id: 9, type: "order", prompt: "Ordene la pregunta sobre la edad:",.replace(',', ''), words: ["old", "are", "How", "you?"], answer: "How old are you?" },
+            { id: 10, type: "order", prompt: "Ordene para responder tu edad (ejemplo):", words: ["years", "I", "old", "am", "32"], answer: "I am 32 years old" }
+        ];
+
+        const container = document.getElementById("exercises-container");
+
+        exercises.forEach((ex, index) => {
+            const div = document.createElement("div");
+            div.className = "exercise";
+            div.innerHTML = `
+                <p><strong>Ejercicio ${index + 1}:</strong> ${ex.prompt}</p>
+                <p><em>Palabras desordenadas:</em> [ ${ex.words.sort(() => Math.random() - 0.5).join(", ")} ]</p>
+                <input type="text" id="input-${ex.id}" placeholder="Escribe tu respuesta aquí...">
+                <button onclick="checkAnswer(${ex.id}, '${ex.answer.replace(/'/g, "\\'")}')">Comprobar</button>
+                <div id="feedback-${ex.id}" class="feedback"></div>
+            `;
+            container.appendChild(div);
+        });
+
+        function checkAnswer(id, correctAnswer) {
+            const userinput = document.getElementById(`input-${id}`).value.trim();
+            const feedback = document.getElementById(`feedback-${id}`);
+            
+            // Limpiamos signos de interrogación o puntos extras para una comparación flexible
+            if (userinput.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedback.textContent = "¡Correcto! Great job!";
+                feedback.className = "feedback correct";
+            } else {
+                feedback.textContent = `Incorrecto. La respuesta esperada era: "${correctAnswer}"`;
+                feedback.className = "feedback incorrect";
+            }
+        }
+    </script>
+</body>
+</html>
