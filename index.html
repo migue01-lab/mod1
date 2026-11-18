@@ -91,16 +91,16 @@
 
     <script>
         const exercises = [
-            { id: 1, prompt: "Order the words to ask about someone's occupation:", words: ["What", "does", "she", "do?"], answer: "What does she do?" },
-            { id: 2, prompt: "Build the sentence for a female doctor:", words: ["She", "is", "a", "doctor"], answer: "She is a doctor" },
-            { id: 3, prompt: "Make the question for plural occupations:", words: ["What", "do", "they", "do?"], answer: "What do they do?" },
-            { id: 4, prompt: "Construct the plural sentence for engineers:", words: ["They", "are", "engineers"], answer: "They are engineers" },
-            { id: 5, prompt: "Form the sentence using the correct vowel article:", words: ["She", "is", "an", "artist"], answer: "She is an artist" },
-            { id: 6, prompt: "Create the sentence with the word 'student':", words: ["She", "is", "a", "student"], answer: "She is a student" },
-            { id: 7, prompt: "Build the sentence using 'chef':", words: ["She", "is", "a", "chef"], answer: "She is a chef" },
-            { id: 8, prompt: "Put your personal occupation response in order:", words: ["I", "am", "an", "English", "teacher"], answer: "I am an English teacher" },
-            { id: 9, prompt: "Organize the words to ask someone's age:", words: ["How", "old", "are", "you?"], answer: "How old are you?" },
-            { id: 10, prompt: "Arrange the words to state an age example:", words: ["I", "am", "32", "years", "old"], answer: "I am 32 years old" }
+            { id: 1, words: ["What", "does", "she", "do?"], answer: "What does she do?" },
+            { id: 2, words: ["She", "is", "a", "doctor"], answer: "She is a doctor" },
+            { id: 3, words: ["What", "do", "they", "do?"], answer: "What do they do?" },
+            { id: 4, words: ["They", "are", "engineers"], answer: "They are engineers" },
+            { id: 5, words: ["She", "is", "an", "artist"], answer: "She is an artist" },
+            { id: 6, words: ["She", "is", "a", "student"], answer: "She is a student" },
+            { id: 7, words: ["She", "is", "a", "chef"], answer: "She is a chef" },
+            { id: 8, words: ["I", "am", "an", "English", "teacher"], answer: "I am an English teacher" },
+            { id: 9, words: ["How", "old", "are", "you?"], answer: "How old are you?" },
+            { id: 10, words: ["I", "am", "32", "years", "old"], answer: "I am 32 years old" }
         ];
 
         const attempts = {};
@@ -113,7 +113,7 @@
             const div = document.createElement("div");
             div.className = "exercise";
             div.innerHTML = `
-                <p><strong>Exercise ${index + 1}:</strong> ${ex.prompt}</p>
+                <p><strong>Exercise ${index + 1}</strong></p>
                 <div class="drop-zone" id="drop-${ex.id}" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
                 <div class="word-bank" id="bank-${ex.id}" ondragover="allowDrop(event)" ondrop="dropToBank(event)">
                     ${shuffledWords.map(w => `<div class="word-chip" draggable="true" ondragstart="drag(event)">${w}</div>`).join('')}
@@ -180,7 +180,7 @@
             } else {
                 attempts[id]++;
                 if (attempts[id] === 1) {
-                    feedback.textContent = "Incorrect. Check your order and try again!";
+                    feedback.textContent = "Incorrect. Try again!";
                     feedback.className = "feedback incorrect";
                 } else {
                     feedback.textContent = `Incorrect. The correct answer was: "${correctAnswer}"`;
