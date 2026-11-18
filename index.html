@@ -106,23 +106,26 @@
         const attempts = {};
         const container = document.getElementById("exercises-container");
 
-        exercises.forEach((ex, index) => {
-            attempts[ex.id] = 0;
-            const shuffledWords = [...ex.words].sort(() => Math.random() - 0.5);
+        function renderExercises() {
+            container.innerHTML = "";
+            exercises.forEach((ex, index) => {
+                if (attempts[ex.id] === undefined) attempts[ex.id] = 0;
+                const shuffledWords = [...ex.words].sort(() => Math.random() - 0.5);
 
-            const div = document.createElement("div");
-            div.className = "exercise";
-            div.innerHTML = `
-                <p><strong>Exercise ${index + 1}</strong></p>
-                <div class="drop-zone" id="drop-${ex.id}" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
-                <div class="word-bank" id="bank-${ex.id}" ondragover="allowDrop(event)" ondrop="dropToBank(event)">
-                    ${shuffledWords.map(w => `<div class="word-chip" draggable="true" ondragstart="drag(event)">${w}</div>`).join('')}
-                </div>
-                <button onclick="checkAnswer(${ex.id}, '${ex.answer.replace(/'/g, "\\\\'")}')">Check</button>
-                <div id="feedback-${ex.id}" class="feedback"></div>
-            `;
-            container.appendChild(div);
-        });
+                const div = document.createElement("div");
+                div.className = "exercise";
+                div.innerHTML = `
+                    <p><strong>Exercise ${index + 1}</strong></p>
+                    <div class="drop-zone" id="drop-${ex.id}" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+                    <div class="word-bank" id="bank-${ex.id}" ondragover="allowDrop(event)" ondrop="dropToBank(event)">
+                        ${shuffledWords.map(w => `<div class="word-chip" draggable="true" ondragstart="drag(event)">${w}</div>`).join('')}
+                    </div>
+                    <button onclick="checkAnswer(${ex.id}, '${ex.answer.replace(/'/g, "\\\\anche")}')">Check</button>
+                    <div id="feedback-${ex.id}" class="feedback"></div>
+                `;
+                container.appendChild(div);
+            });
+        }
 
         function allowDrop(ev) {
             ev.preventDefault();
@@ -182,12 +185,26 @@
                 if (attempts[id] === 1) {
                     feedback.textContent = "Incorrect. Try again!";
                     feedback.className = "feedback incorrect";
+                    // Restablece las fichas automáticamente al banco mezcladas de nuevo
+                    resetExercise(id);
                 } else {
                     feedback.textContent = `Incorrect. The correct answer was: "${correctAnswer}"`;
                     feedback.className = "feedback reveal";
                 }
             }
         }
+
+        function resetExercise(id) {
+            const ex = exercises.find(e => e.id === id);
+            const dropZone = document.getElementById(`drop-${id}`);
+            const bank = document.getElementById(`bank-${id}`);
+            
+            dropZone.innerHTML = "";
+            const shuffledWords = [...ex.words].sort(() => Math.random() - 0.5);
+            bank.innerHTML = shuffledWords.map(w => `<div class="word-chip" draggable="true" ondragstart="drag(event)">${w}</div>`).join('');
+        }
+
+        renderExercises();
     </script>
 </body>
 </html>
